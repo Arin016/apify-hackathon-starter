@@ -1,11 +1,32 @@
 {
   "actorSpecification": 1,
-  "name": "hackathon-evidence-starter",
-  "title": "Hackathon Evidence Starter",
-  "description": "Setup smoke test: collect a small public HTML evidence sample. Replace with the chosen product before publishing.",
+  "name": "workflow-composer",
+  "title": "Workflow Composer \u2014 Tested Reusable Actors",
+  "description": "Bring selected Actors or a research goal. Compile a typed workflow, test a small live sample, and export a reusable Actor project with evidence and confidence checks.",
   "version": "0.1",
   "buildTag": "latest",
   "dockerfile": "./Dockerfile",
   "input": "./INPUT_SCHEMA.json",
-  "readme": "../README.md"
+  "readme": "../README.md",
+  "output": {
+    "actorOutputSchemaVersion": 1,
+    "title": "Workflow outputs",
+    "properties": {
+      "result": {
+        "type": "string",
+        "title": "Verification result",
+        "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/OUTPUT"
+      },
+      "report": {
+        "type": "string",
+        "title": "Evidence report",
+        "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/REPORT.html"
+      },
+      "project": {
+        "type": "string",
+        "title": "Download generated Actor project",
+        "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/ACTOR_PROJECT.zip"
+      }
+    }
+  }
 }

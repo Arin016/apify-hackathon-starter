@@ -1,17 +1,92 @@
 {
-  "title": "Evidence starter input",
+  "title": "Bring your Actors and compile a reusable workflow",
   "type": "object",
   "schemaVersion": 1,
   "properties": {
-    "aiCheck": {
-      "title": "Check AI connectivity", "type": "boolean", "default": false,
-      "description": "Optional tiny paid inference using Apify credits. Off by default."
-    },
     "mode": {
-      "title": "Run mode", "type": "string", "editor": "select",
-      "enum": ["fixture", "live"], "default": "fixture",
-      "description": "Fixture is synthetic and makes no network requests. Live reads example.com to verify connectivity."
+      "title": "Mode",
+      "type": "string",
+      "editor": "select",
+      "enum": [
+        "plan",
+        "execute"
+      ],
+      "default": "plan",
+      "description": "Plan exports an untested project. Execute runs a bounded live test and verifies source quotes before exporting a tested project."
+    },
+    "goal": {
+      "title": "Desired result",
+      "type": "string",
+      "editor": "textarea",
+      "default": "Research Apify and produce a short source-backed brief about its Actor platform.",
+      "description": "V1 supports research briefs from web search or explicit website URLs."
+    },
+    "actorIds": {
+      "title": "Selected Actors",
+      "type": "array",
+      "editor": "stringList",
+      "default": [],
+      "description": "Supported: apify/google-search-scraper and apify/website-content-crawler. Empty list lets the planner select the supported recipe."
+    },
+    "query": {
+      "title": "Search query",
+      "type": "string",
+      "editor": "textfield",
+      "default": "",
+      "description": "Optional explicit web search query. Leave empty for the planner to propose one."
+    },
+    "startUrls": {
+      "title": "Website URLs",
+      "type": "array",
+      "editor": "stringList",
+      "default": [],
+      "description": "Public HTTP or HTTPS website URLs for the website-only recipe."
+    },
+    "maxPages": {
+      "title": "Maximum pages",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3,
+      "default": 1,
+      "description": "Hard cap on pages passed to the crawler and model."
+    },
+    "maxStepSeconds": {
+      "title": "Timeout per child Actor",
+      "type": "integer",
+      "minimum": 30,
+      "maximum": 120,
+      "default": 90,
+      "description": "Maximum execution time for each downstream Actor."
+    },
+    "testBudgetUsd": {
+      "title": "Child PPE budget allocation USD",
+      "type": "number",
+      "minimum": 0.1,
+      "maximum": 2,
+      "default": 1,
+      "description": "Divided into PPE caps for child runs. Pay-per-usage compute, parent compute, and AI are additional; not a hard total-dollar ceiling."
+    },
+    "planner": {
+      "title": "Planner",
+      "type": "string",
+      "editor": "select",
+      "enum": [
+        "deepseek",
+        "fixed"
+      ],
+      "default": "deepseek",
+      "description": "DeepSeek proposes a typed recipe. Fixed skips model planning for an explicitly configured supported recipe."
+    },
+    "generatedName": {
+      "title": "Generated Actor name",
+      "type": "string",
+      "editor": "textfield",
+      "default": "composed-research-workflow",
+      "pattern": "^[a-z][a-z0-9-]{2,49}$",
+      "description": "Actor name embedded in the generated project."
     }
   },
-  "required": ["mode"]
+  "required": [
+    "goal"
+  ]
 }

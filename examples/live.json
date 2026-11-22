@@ -1,0 +1,14 @@
+{
+  "mode": "execute",
+  "goal": "Research Apify and produce a short source-backed brief about its Actor platform.",
+  "actorIds": [
+    "apify/google-search-scraper",
+    "apify/website-content-crawler"
+  ],
+  "query": "Apify Actors platform site:apify.com",
+  "maxPages": 1,
+  "maxStepSeconds": 90,
+  "testBudgetUsd": 1,
+  "planner": "deepseek",
+  "generatedName": "apify-research-brief-demo"
+}
