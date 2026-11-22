@@ -4,7 +4,19 @@ Bring the Actors you use—or describe your goal—and turn them into one tested
 
 ## Current MVP
 
-Supports two recipes: Google Search Results Scraper → Website Content Crawler → DeepSeek source-backed brief, and Website Content Crawler → DeepSeek brief for explicit URLs. This is a bounded compiler with a small supported catalog, not arbitrary integration code generation. Unsupported selections fail validation or ask for clarification.
+Supports website research (Google Search → Website Content Crawler → DeepSeek, or explicit URLs → crawler → brief) and a new creator-content recipe (Instagram + YouTube → freshness/metric checks → within-platform ranking → five sourced creative ideas). This is a bounded compiler with a small supported catalog, not arbitrary Store-wide discovery or integration code generation. Unsupported selections fail validation or ask for clarification.
+
+## Creator-content example
+
+In Apify Console, set **Workflow type = Choose from my goal**, **Mode = execute**, and use:
+
+> Give me five food content ideas for an Indian audience based on engagement on recent social posts from the last 7 days.
+
+Leave **Selected Actors**, search query and website URLs empty. The router extracts the niche, audience, window and source search terms; the deterministic controller chooses Instagram and YouTube internally. Use `examples/creator-food.json` for the same test via CLI. Each source collects at most 15 results. Creator mode needs at least $1 of child PPE allocations ($0.50 caps, not upfront charges).
+
+The output must contain at least five dated posts with numeric likes/comments and evidence from both platforms. Otherwise it returns **INSUFFICIENT_EVIDENCE** and no fabricated five-idea brief. A platform run can succeed while yielding zero usable content. Passing samples produce five distinct ideas citing at least three posts across both platforms; source relevance still requires human review.
+
+Ranking uses percentiles within each collected platform sample of `log(1 + (likes + 3 * comments) / max(6, ageHours))`. This is a heuristic. It does not measure historical growth, predict virality, establish nationwide trends, or verify creator geography. Unknown views remain unknown. No video-content analysis/transcription runs. TikTok is not part of the India-focused recipe. The current implementation does **not** compare competing workflows or claim to find the cheapest passing option.
 
 ## Run
 
@@ -26,7 +38,8 @@ Local cloud-token inference can fail with OAuth authentication; the verified pat
 ## Inputs
 
 - `mode`: `plan` (default) or `execute`. Plan mode produces an untested export. Execute runs a small test and verifies evidence before exporting.
-- `goal`: the desired research result.
+- `workflowMode`: `auto` (default), `research`, or `creator`. Auto routes goal-only requests; supplied research query/URLs/Actor selections take the research path.
+- `goal`: the desired research result or creator-content brief.
 - `actorIds`: supported Actor IDs. Empty selects a supported recipe from the goal and supplied sources.
 - `query`: optional explicit search query; otherwise DeepSeek proposes one.
 - `startUrls`: explicit public website URLs for the website-only recipe.
@@ -46,6 +59,8 @@ The run's key-value store contains:
 - `STATE` and `STEP_*`: checkpoints for resurrection of this same run.
 - `ACTOR_PROJECT.zip`: generated project with frozen workflow, source, Dockerfile, schema, lockfile, tests and README. No account tokens are packaged.
 
+Creator runs instead save `GOAL_ROUTE`, `CREATOR_WINDOW_END`, `CREATOR_INPUT_HASH`, `CREATOR_CONTRACTS`, `CREATOR_CHILDREN` and verified `CREATOR_IDEAS` checkpoints. Creator exports contain `compiled.creator.json`; their goal and source selection are frozen. Creator reports use explicit quality checks rather than the research recipe's verification-coverage score.
+
 Download and unzip the project, then run `apify push` with the CLI already logged in. Dependencies build in the cloud. The CLI creates the new private Actor using the exported name. Automatic creation from inside a limited-permission Actor is not implemented: it needs a separate deployment authorization path. The generated Actor runs without another planning call. Its goal, Actors, builds and mappings are fixed; users can change query/URLs and bounded execution limits. Reusing with other inputs requires fresh verification.
 
 ## Deterministic spine and bounded AI
@@ -63,11 +78,11 @@ Confidence is a deterministic verification-coverage score: contracts 20, plan 20
 
 ## Limits
 
-- Two supported research recipes; no arbitrary DAGs, joins, branches, or MCP discovery UI yet.
+- Two supported research recipes and one creator recipe; no arbitrary DAGs, alternative-workflow benchmark, joins, branches, or MCP discovery UI yet.
 - Only public IPv4 source destinations pass the initial URL policy. Downstream redirect behavior is delegated to the selected Actors; this is not a hardened general-purpose URL proxy.
 - Dependencies may be blocked, unavailable, change behavior, return no rows, or fail. Such runs fail clearly; missing data is not invented.
 - Checkpointing is scoped to resurrection of the same run, not deduplication of separate user requests. A crash between accepting a remote start and saving its ID is an unresolved distributed-systems window; exactly-once execution is not guaranteed.
-- Planner has at most two attempts and the brief one call per uninterrupted execution. Process resurrection can repeat an incomplete model call.
+- Research planning has at most two attempts and the brief one call, plus one routing call for goal-only auto mode. Creator mode has one routing call and at most one idea-generation call per uninterrupted execution. Process resurrection can repeat an incomplete model call. The `fixed` setting applies to research planning, not creator routing.
 - The search recipe requires a maximum-cost allocation of at least $1 ($0.50 per child) because of the search dependency’s minimum cap setting; this is not an upfront charge.
 
 - No automatic model-provider fallback, hidden credential sharing, Store publication or billing configuration.

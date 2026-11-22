@@ -9,10 +9,11 @@ export async function readWithRetry<T>(operation: () => Promise<T>): Promise<T> 
   try { return await operation(); } catch { return operation(); }
 }
 export async function inspect(actorId: string, pinned?: Contract): Promise<Contract> {
-  const actor = Actor.apifyClient.actor(actorId);
+  const reader = Actor.newClient({ maxRetries: 0, timeoutSecs: 15 });
+  const actor = reader.actor(actorId);
   const details = await readWithRetry(() => actor.get());
   if (!details || details.actorPermissionLevel === 'FULL_PERMISSIONS') throw new Error(`Unsupported or full-permission dependency: ${actorId}`);
-  const buildClient = pinned ? Actor.apifyClient.build(pinned.buildId) : await readWithRetry(() => actor.defaultBuild());
+  const buildClient = pinned ? reader.build(pinned.buildId) : await readWithRetry(() => actor.defaultBuild());
   const build = await readWithRetry(() => buildClient.get());
   if (!build || build.status !== 'SUCCEEDED' || !build.inputSchema) throw new Error(`No successful build/input contract: ${actorId}`);
   const schema = typeof build.inputSchema === 'string' ? JSON.parse(build.inputSchema) : build.inputSchema;

@@ -1,0 +1,11 @@
+{
+  "workflowMode": "auto",
+  "mode": "execute",
+  "goal": "Give me five food content ideas for an Indian audience based on engagement on recent social posts from the last 7 days.",
+  "actorIds": [],
+  "query": "",
+  "startUrls": [],
+  "maxStepSeconds": 120,
+  "testBudgetUsd": 1,
+  "generatedName": "india-food-creator-brief"
+}

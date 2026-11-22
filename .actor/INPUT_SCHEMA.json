@@ -3,6 +3,15 @@
   "type": "object",
   "schemaVersion": 1,
   "properties": {
+    "workflowMode": {
+      "title": "Workflow type",
+      "type": "string",
+      "editor": "select",
+      "enum": ["auto", "research", "creator"],
+      "enumTitles": ["Choose from my goal", "Website research", "Creator content brief"],
+      "default": "auto",
+      "description": "Auto routes a goal-only request into a supported recipe. Creator mode selects Instagram and YouTube internally; it does not search the full Actor Store."
+    },
     "mode": {
       "title": "Mode",
       "type": "string",
@@ -19,14 +28,15 @@
       "type": "string",
       "editor": "textarea",
       "default": "Research Apify and produce a short source-backed brief about its Actor platform.",
-      "description": "V1 supports research briefs from web search or explicit website URLs."
+      "description": "Describe your desired result. For example: Give me five food content ideas for an Indian audience based on engagement on recent social posts from the last 7 days. Creator mode uses Instagram + YouTube, with evidence quality gates."
     },
     "actorIds": {
-      "title": "Selected Actors",
+      "title": "Optional research Actors (leave empty for automatic selection)",
+      "sectionCaption": "Advanced research settings",
       "type": "array",
       "editor": "stringList",
       "default": [],
-      "description": "Supported: apify/google-search-scraper and apify/website-content-crawler. Empty list lets the planner select the supported recipe."
+      "description": "Optional override for website research only: apify/google-search-scraper and apify/website-content-crawler. Leave empty for creator briefs. Automatic selection is limited to supported recipes, not the whole Store."
     },
     "query": {
       "title": "Search query",

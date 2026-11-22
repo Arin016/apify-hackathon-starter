@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const SEARCH = 'apify/google-search-scraper';
 export const CRAWLER = 'apify/website-content-crawler';
 export const Input = z.object({
+  workflowMode: z.enum(['auto', 'research', 'creator']).default('auto'),
   mode: z.enum(['plan', 'execute']).default('plan'),
   goal: z.string().trim().min(8).max(1500),
   actorIds: z.array(z.enum([SEARCH, CRAWLER])).max(2).default([]),

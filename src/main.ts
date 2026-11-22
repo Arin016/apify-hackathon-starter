@@ -6,6 +6,7 @@ import { inspect } from './platform.js';
 import { propose } from './planner.js';
 import { execute, platformServices, type Journal } from './workflow.js';
 import { exportProject, reportHtml } from './artifacts.js';
+import { routeGoal, runCreator, type CreatorSpec } from './creator.js';
 
 await Actor.init();
 let state: Journal | undefined;
@@ -18,8 +19,26 @@ try {
   try { frozen = JSON.parse(await readFile(new URL('../compiled.workflow.json', import.meta.url), 'utf8')); }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
   const raw = await Actor.getInput<Record<string, unknown>>() ?? {};
+  console.log('CONTROLLER: input received');
+  let creatorFrozen: { input: Record<string, any>; spec: CreatorSpec; contracts: Contract[] } | undefined;
+  try { creatorFrozen = JSON.parse(await readFile(new URL('../compiled.creator.json', import.meta.url), 'utf8')); }
+  catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
+  if (creatorFrozen && raw.goal && raw.goal !== creatorFrozen.input.goal) throw new Error('Frozen creator goal cannot be overridden; compile a new workflow.');
   if (frozen && ((raw.goal && raw.goal !== frozen.input.goal) || (raw.actorIds && hash(raw.actorIds) !== hash(frozen.input.actorIds)))) throw new Error('Frozen goal/Actor selections cannot be overridden; compile a new workflow');
-  const input = Input.parse({ ...frozen?.input, ...raw });
+  const input = Input.parse({ ...frozen?.input, ...creatorFrozen?.input, ...raw });
+  if (creatorFrozen && (input.workflowMode !== 'creator' || input.actorIds.length)) throw new Error('Frozen creator source selection cannot be overridden.');
+  let route = await Actor.getValue<CreatorSpec>('GOAL_ROUTE');
+  console.log('CONTROLLER: routing checkpoint read');
+  if (!frozen && !route && (creatorFrozen || input.workflowMode === 'creator' || (input.workflowMode === 'auto' && !input.actorIds.length && !input.startUrls.length && !input.query))) {
+    route = creatorFrozen?.spec ?? await routeGoal(input.goal);
+    await Actor.setValue('GOAL_ROUTE',route);
+  }
+  if (!frozen && (creatorFrozen || input.workflowMode === 'creator' || route?.kind === 'creator')) {
+    if (!route || route.kind !== 'creator') throw new Error('Creator mode needs a recent social-content brief goal.');
+    await runCreator(input,route,creatorFrozen?.contracts);
+    await Actor.exit();
+  }
+  if (route?.kind === 'unsupported') throw new Error('Goal is outside supported research and creator-brief recipes.');
   const inputHash = hash(input);
   state = await Actor.getValue<Journal>('STATE') ?? { inputHash, planHash: '', phase: 'VALIDATING', events: [], children: {} };
   if (state.inputHash !== inputHash) throw new Error('Checkpoint input differs; use a fresh run');
@@ -44,7 +63,7 @@ try {
   }
   if (!plan) throw new Error('No compiled plan');
   checks.plan = true; state.planHash = hash(plan); await save(); await Actor.setValue('PLAN', plan);
-  const budgetPolicy = { perChildPpeChargeCapUsd: input.testBudgetUsd / plan.actorIds.length, maxStepSeconds: input.maxStepSeconds, childMemoryMb: 1024, maxPages: input.maxPages, maxPaidChildStarts: plan.actorIds.length, maxModelCalls: frozen || input.planner === 'fixed' ? 1 : 3, note: 'PPE caps plus page/time/memory bounds. Not a guaranteed total-dollar cap: pay-per-usage dependency costs, parent compute and model usage remain additional. No automatic child restarts or blind start retries.' };
+  const budgetPolicy = { perChildPpeChargeCapUsd: input.testBudgetUsd / plan.actorIds.length, maxStepSeconds: input.maxStepSeconds, childMemoryMb: 1024, maxPages: input.maxPages, maxPaidChildStarts: plan.actorIds.length, maxModelCalls: (frozen || input.planner === 'fixed' ? 1 : 3) + (route ? 1 : 0), note: 'PPE caps plus page/time/memory bounds. Not a guaranteed total-dollar cap: pay-per-usage dependency costs, parent compute and model usage remain additional. No automatic child restarts or blind start retries.' };
   let result: Record<string, any>;
   if (input.mode === 'plan') result = { status: 'PLANNED_NOT_TESTED', confidence: confidence(checks) };
   else {
