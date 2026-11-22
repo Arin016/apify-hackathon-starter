@@ -24,3 +24,8 @@ test('creator report escapes model and source markup',()=>{
  const html=creatorReport({spec:{niche:'<script>bad()</script>'},status:'INSUFFICIENT_EVIDENCE',posts:[],children:{}});
  assert.ok(html.includes('&lt;script&gt;bad()&lt;/script&gt;'));assert.equal(html.includes('<script>bad()</script>'),false);
 });
+test('editorial gate rejects observed unsupported growth and nutrition promises',()=>{
+ const posts=normalizePosts('Instagram',[row],start,end);
+ const ideas={ideas:[{title:'Viral high-protein breakfast',hook:'Ready in 5 minutes',angle:'Weight loss promise',evidenceIds:[posts[0]!.id]}]};
+ assert.throws(()=>validateIdeas(ideas,posts),/IDEA_COPY_GATE/);
+});
