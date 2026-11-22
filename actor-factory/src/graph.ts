@@ -76,6 +76,8 @@ export function schemaValidator(schema:Record<string,unknown>) {
 export function compileGraph(raw:unknown,allowedActorIds:string[],ppeBudgetUsd=2):CompiledGraph {
  bounded(raw,60000);
  const graph=Graph.parse(raw);
+ const templates=[graph.outputTemplate,...graph.steps.flatMap(step=>step.kind==='actor'?[step.inputTemplate]:step.kind==='model'?[step.contextTemplate]:[])];
+ if(templates.some(value=>/\{\{[^{}]+\}\}/.test(JSON.stringify(value))))throw new Error('UNSUPPORTED_TEMPLATE_STRING: use $from JSON pointer references, not {{...}} placeholders');
  schemaValidator(graph.inputSchema);schemaValidator(graph.outputSchema);
  const ids=new Set(graph.steps.map(s=>s.id));if(ids.size!==graph.steps.length)throw new Error('DUPLICATE_STEP_ID');
  ids.forEach(safeKey);
