@@ -1,6 +1,7 @@
 import {Actor} from 'apify';
 import {z} from 'zod';
 import {analyze} from './llm.js';
+import {retryMalformedJson} from './model-retry.js';
 import {inspect,validateDependencyInput} from './platform.js';
 import {hash,type Contract} from './contracts.js';
 import {renderReport,type VisualNode} from './presentation.js';
@@ -36,9 +37,9 @@ export function campaignReport(out:any){
 export async function runCampaign(raw:unknown){
  const input=Request.parse(raw);const fingerprint=hash(input);const saved:any=await Actor.getValue('CAMPAIGN_STATE');if(saved&&saved.fingerprint!==fingerprint)throw new Error('Checkpoint brief changed; start a fresh run.');
  if(saved&&!saved.react)throw new Error("Legacy research checkpoint: start a fresh run for the ReAct engine.");
- const state:any=saved??{fingerprint,end:Date.now(),tools:[],events:[],modelCalls:0,react:{version:1,turns:[]}};const out:any={status:'RUNNING',input,react:state.react,tools:state.tools,events:state.events,posts:[],places:[],limits:{maxActorStarts:5,maxModelCalls:9,maxRowsPerSocialTool:12,lookbackDays:input.lookbackDays,perActorPpeCapUsd:0.5,meaning:'PPE caps do not include all compute/inference charges. No automatic start retries.'}};
+ const state:any=saved??{fingerprint,end:Date.now(),tools:[],events:[],modelCalls:0,react:{version:1,turns:[]}};const out:any={status:'RUNNING',input,react:state.react,tools:state.tools,events:state.events,posts:[],places:[],limits:{maxActorStarts:5,maxModelCalls:12,maxRowsPerSocialTool:12,lookbackDays:input.lookbackDays,perActorPpeCapUsd:0.5,meaning:'PPE caps do not include all compute/inference charges. No automatic start retries.'}};
  const save=()=>Actor.setValue('CAMPAIGN_STATE',state);const write=async()=>{await Actor.setValue('OUTPUT',out);await Actor.setValue('REPORT.html',campaignReport(out),{contentType:'text/html'});};const event=async(phase:string,detail:string)=>{state.events.push({at:new Date().toISOString(),phase,detail});await save();await Actor.setStatusMessage(phase+': '+detail);await write();};await write();
- const model=async<T>(key:string,context:any,instruction:string,schema:z.ZodType<T>):Promise<T>=>{const cached=await Actor.getValue<T>(key);if(cached)return schema.parse(cached);if(state.modelCalls>=9)throw new Error('Model call budget exhausted');state.modelCalls++;await save();const result=await analyze(JSON.stringify(context),instruction,schema);await Actor.setValue(key,result);return result;};
+ const model=async<T>(key:string,context:any,instruction:string,schema:z.ZodType<T>):Promise<T>=>{const cached=await Actor.getValue<T>(key);if(cached)return schema.parse(cached);const result=await retryMalformedJson(async attempt=>{if(state.modelCalls>=12)throw new Error('Model call budget exhausted');state.modelCalls++;if(attempt){state.events.push({at:new Date().toISOString(),phase:'MODEL_RETRY',detail:'Malformed JSON: retrying the model response once.'});await Actor.setStatusMessage('Retrying malformed model response');}await save();return analyze(JSON.stringify(context),instruction+(attempt?' Return a concise, complete JSON response.':''),schema);});await Actor.setValue(key,result);return result;};
  const publicBrief={eventBrief:input.eventBrief,city:input.city,audience:input.audience,objective:input.objective,venue:input.venue};
  const contracts=new Map<string,Contract>();const start=state.end-input.lookbackDays*86400000;
  const call=async(key:string,actorId:string,args:Record<string,any>,followUp=false)=>{

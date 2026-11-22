@@ -51,7 +51,7 @@ Launch pricing: no additional Actor fee. Platform usage, dependent Actor charges
 
 ## Costs and execution limits
 
-At most five paid Actor starts and seven ReAct decisions, plus up to two final drafting/repair model calls, and 12 requested posts per social-tool call. Each tool has a $0.50 PPE cap, 1 GB memory and 90-second timeout. Dataset reads are capped. Parent execution is bounded separately. PPE caps do not guarantee an all-in dollar limit: usage-based compute and model charges are additional. Reported tool costs exclude the agent's own compute and inference.
+At most five paid Actor starts and seven ReAct decisions, plus up to two final drafting/repair calls and bounded malformed-response retries (12 model calls total), and 12 requested posts per social-tool call. Each tool has a $0.50 PPE cap, 1 GB memory and 90-second timeout. Dataset reads are capped. Parent execution is bounded separately. PPE caps do not guarantee an all-in dollar limit: usage-based compute and model charges are additional. Reported tool costs exclude the agent's own compute and inference.
 
 The Actor uses platform usage billing for this initial demo; no additional creator-agent fee is configured. A per-completed-campaign fee can be evaluated after repeated cost measurements. Child Actor charges still apply.
 

@@ -1,0 +1,3 @@
+import{test}from'node:test';import assert from'node:assert/strict';import{retryMalformedJson}from'../src/model-retry.js';
+test('malformed JSON is retried once and the valid result is returned',async()=>{let calls=0;const value=await retryMalformedJson(async()=>{calls++;if(calls===1)throw new SyntaxError('unterminated JSON');return {tool:'tiktok'};});assert.deepEqual(value,{tool:'tiktok'});assert.equal(calls,2);});
+test('only malformed JSON is retried, and a second malformed response fails',async()=>{let count=0;await assert.rejects(retryMalformedJson(async()=>{count++;throw new Error('HTTP 401');}));assert.equal(count,1);count=0;await assert.rejects(retryMalformedJson(async()=>{count++;throw new SyntaxError('invalid JSON');}));assert.equal(count,2);});
