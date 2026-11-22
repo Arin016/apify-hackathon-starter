@@ -1,0 +1,37 @@
+{
+  "actorSpecification": 1,
+  "name": "actor-workflow-factory",
+  "title": "Actor Workflow Factory \u2014 Discover, Test, Export",
+  "description": "Describe a goal, discover Apify Actors, compile a structured workflow, test reviewed dependencies and export a reusable Actor project.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "dockerfile": "./Dockerfile",
+  "input": "./INPUT_SCHEMA.json",
+  "readme": "../README.md",
+  "output": {
+    "actorOutputSchemaVersion": 1,
+    "title": "Workflow factory outputs",
+    "properties": {
+      "result": {
+        "type": "string",
+        "title": "Plan and test result (JSON)",
+        "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/OUTPUT"
+      },
+      "report": {
+        "type": "string",
+        "title": "Visual workflow and evidence report",
+        "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/REPORT.html"
+      },
+      "project": {
+        "type": "string",
+        "title": "Download Actor project ZIP",
+        "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/ACTOR_PROJECT.zip"
+      },
+      "deployment": {
+        "type": "string",
+        "title": "Deployment receipt",
+        "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/DEPLOYMENT"
+      }
+    }
+  }
+}
