@@ -1,4 +1,11 @@
-# Workflow Composer
+# Actor Fit — Workflow Optimization
+
+The public Actor has one flow: **compare complete workflows on the same inputs and requirements, then export the lowest observed-cost passing candidate.**
+
+For the demo, enter a public HTTPS URL (default: `https://apify.com/actors`) and press Start. No Actor selection, planner, creator mode or workflow-type dropdown is required. Advanced users can provide a custom comparison suite in `benchmarkJson`. Run one comparison at a time on a five-concurrent-run account.
+
+The runtime retains compiled-graph and frozen-project execution internally so comparisons and generated Actors remain runnable. The older recipe documentation below describes these implementation components; they are not additional public product modes.
+
 
 Bring your current workflow or goal. Compare complete alternatives against the same output requirements on your sample, then export a passing workflow as a reusable Actor.
 

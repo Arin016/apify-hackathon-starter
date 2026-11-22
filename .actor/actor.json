@@ -1,8 +1,8 @@
 {
   "actorSpecification": 1,
   "name": "workflow-composer",
-  "title": "Workflow Composer \u2014 Tested Reusable Actors",
-  "description": "Bring selected Actors or a research goal. Compile a typed workflow, test a small live sample, and export a reusable Actor project with evidence and confidence checks.",
+  "title": "Actor Fit \u2014 Workflow Optimization",
+  "description": "Compare complete Apify workflows on the same inputs and output requirements. Inspect measured costs and quality checks, then export a tested winner as a reusable Actor.",
   "version": "0.1",
   "buildTag": "latest",
   "dockerfile": "./Dockerfile",
@@ -10,16 +10,16 @@
   "readme": "../README.md",
   "output": {
     "actorOutputSchemaVersion": 1,
-    "title": "Workflow outputs",
+    "title": "Workflow comparison",
     "properties": {
       "result": {
         "type": "string",
-        "title": "Verification result",
+        "title": "Comparison result and measured costs",
         "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/OUTPUT"
       },
       "report": {
         "type": "string",
-        "title": "Evidence report",
+        "title": "Open graphical workflow comparison",
         "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/REPORT.html"
       },
       "project": {

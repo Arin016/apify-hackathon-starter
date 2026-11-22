@@ -31,7 +31,16 @@ try {
   try { creatorFrozen = JSON.parse(await readFile(new URL('../compiled.creator.json', import.meta.url), 'utf8')); }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
   if(graphFrozen&&raw.workflowMode&&raw.workflowMode!=='graph')throw new Error('Frozen graph execution mode cannot be overridden');
-  if(!frozen&&!creatorFrozen&&!graphFrozen&&raw.workflowMode==='benchmark'){await runBenchmark(raw);await Actor.exit();}
+  if(!frozen&&!creatorFrozen&&!graphFrozen) {
+    // The public product has one job. Graph mode remains an internal comparison worker.
+    const worker=raw.workflowMode==='graph'&&typeof raw.acceptanceJson==='string'&&raw.acceptanceJson.length>0;
+    if(!worker) {
+      requestedMode='benchmark';
+      if(raw.workflowMode&&raw.workflowMode!=='benchmark')throw new Error('This Actor compares complete workflows. Use the workflow comparison input form.');
+      const parametersJson=typeof raw.parametersJson==='string'&&raw.parametersJson!=='{}'?raw.parametersJson:JSON.stringify({url:typeof raw.url==='string'?raw.url:'https://apify.com/actors',query:typeof raw.url==='string'?raw.url:'https://apify.com/actors'});
+      await runBenchmark({...raw,workflowMode:'benchmark',mode:'execute',parametersJson,testBudgetUsd:raw.testBudgetUsd??2});await Actor.exit();
+    }
+  }
   if(graphFrozen||(!frozen&&!creatorFrozen&&(raw.workflowMode==='graph'||(raw.workflowMode==='auto'&&Array.isArray(raw.candidateActorIds)&&raw.candidateActorIds.length)))) {
     await runGraph(raw,graphFrozen);await Actor.exit();
   }
