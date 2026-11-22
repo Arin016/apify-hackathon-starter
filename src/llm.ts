@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// Optional paid path. Never called by the smoke test or starter Actor.
+// Optional paid path. The starter calls it only when aiCheck is enabled.
 // Apify proxy uses Apify credits; a separate AI-provider account is unnecessary.
 export async function analyze<T>(sourceText: string, instruction: string, schema: z.ZodType<T>): Promise<T> {
   const token = process.env.APIFY_TOKEN;
@@ -9,7 +9,7 @@ export async function analyze<T>(sourceText: string, instruction: string, schema
     method: 'POST', signal: AbortSignal.timeout(45000),
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: process.env.LLM_MODEL || 'openai/gpt-4.1-mini',
+      model: process.env.LLM_MODEL || 'deepseek/deepseek-v4-flash',
       temperature: 0, max_tokens: 1200,
       response_format: { type: 'json_object' },
       messages: [
