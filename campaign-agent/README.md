@@ -45,7 +45,7 @@ Use public data and comply with the target platforms' terms. Campaign drafts req
 
 ## Pricing
 
-$0.50 per generated campaign pack containing at least one supported creator recommendation. The pack contains up to three recommendations. No campaign-pack fee is charged for an insufficient-evidence result with no recommendations. Platform usage, dependent Actor charges and inference are additional; the report separates recorded child costs from unmeasured inference and parent charges. This is not an all-inclusive price.
+Launch pricing: no additional Actor fee. Platform usage, dependent Actor charges and inference still apply; the report separates recorded child costs from inference and parent charges. This is not a zero-cost run. Planned monetization is $0.50 per generated campaign pack with at least one supported recommendation, but that fee is not active: the owner must complete payout billing information before enabling paid events. The pack contains up to three recommendations.
 
 ## Costs and execution limits
 
