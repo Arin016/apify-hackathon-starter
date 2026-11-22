@@ -1,0 +1,76 @@
+{
+  "title": "Create an evidence-backed event campaign",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "eventBrief": {
+      "title": "What are you promoting?",
+      "type": "string",
+      "editor": "textarea",
+      "description": "Describe the event, launch or campaign. Include the product or experience and the kind of creator you need.",
+      "default": "A weekend vintage-fashion pop-up featuring independent sellers, styling sessions and sustainable fashion.",
+      "prefill": "A weekend vintage-fashion pop-up featuring independent sellers, styling sessions and sustainable fashion."
+    },
+    "city": {
+      "title": "City",
+      "type": "string",
+      "editor": "textfield",
+      "description": "City that must be explicitly mentioned in supporting creator captions. This is local-content evidence, not verified audience location.",
+      "default": "London",
+      "prefill": "London"
+    },
+    "audience": {
+      "title": "Intended audience",
+      "type": "string",
+      "editor": "textfield",
+      "description": "Your target audience; the agent does not infer or verify creators\u2019 audience demographics.",
+      "default": "People interested in vintage fashion and independent brands",
+      "prefill": "People interested in vintage fashion and independent brands"
+    },
+    "objective": {
+      "title": "Campaign objective",
+      "type": "string",
+      "editor": "textfield",
+      "description": "What should the proposed collaboration encourage? Attendance, awareness or another clear action.",
+      "default": "Drive awareness and visits to the pop-up",
+      "prefill": "Drive awareness and visits to the pop-up"
+    },
+    "venue": {
+      "title": "Venue (optional)",
+      "type": "string",
+      "editor": "textfield",
+      "description": "Venue name for Google Maps context. Leave empty for the agent to research a relevant venue category.",
+      "default": "Old Spitalfields Market",
+      "prefill": "Old Spitalfields Market"
+    },
+    "lookbackDays": {
+      "title": "Evidence lookback (days)",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 180,
+      "default": 90,
+      "description": "Only dated social posts in this window can support recommendations. One snapshot cannot establish growth."
+    },
+    "instagramHashtag": {
+      "title": "Instagram research hashtag (optional)",
+      "sectionCaption": "Advanced research hints",
+      "type": "string",
+      "editor": "textfield",
+      "default": "",
+      "description": "Optional seed without # or spaces. Leave empty for the agent to choose from your brief."
+    },
+    "tiktokSearch": {
+      "title": "TikTok search (optional)",
+      "type": "string",
+      "editor": "textfield",
+      "default": "",
+      "description": "Optional initial query. Leave empty for the agent to choose. One evidence-driven follow-up is allowed."
+    }
+  },
+  "required": [
+    "eventBrief",
+    "city",
+    "audience",
+    "objective"
+  ]
+}

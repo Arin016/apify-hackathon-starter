@@ -1,0 +1,30 @@
+{
+  "actorSpecification": 1,
+  "name": "localcollab-campaign-agent",
+  "title": "LocalCollab \u2014 Creator Campaign Agent",
+  "description": "An event marketing agent that uses Google Maps, Instagram and TikTok as tools to research creators and deliver evidence-backed collaboration concepts, shot lists and outreach drafts.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "dockerfile": "./Dockerfile",
+  "input": "./INPUT_SCHEMA.json",
+  "readme": "../README.md",
+  "output": {
+    "actorOutputSchemaVersion": 1,
+    "title": "Campaign research outputs",
+    "properties": {
+      "report": {
+        "type": "string",
+        "title": "Open visual campaign report",
+        "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/REPORT.html"
+      },
+      "result": {
+        "type": "string",
+        "title": "Campaign plan, evidence and decisions",
+        "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/OUTPUT"
+      }
+    }
+  },
+  "storages": {
+    "dataset": "./dataset_schema.json"
+  }
+}

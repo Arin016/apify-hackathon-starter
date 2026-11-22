@@ -1,0 +1,34 @@
+{
+  "name": "localcollab-campaign-agent",
+  "version": "0.1.0",
+  "private": true,
+  "overrides": {
+    "basic-ftp": "6.2.6",
+    "minimatch": "11.0.9"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "tsx src/main.ts",
+    "build": "tsc",
+    "check": "tsc --noEmit",
+    "smoke": "node --import tsx --test tests/workflow.test.ts",
+    "test": "node --import tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "apify": "^3.8.0",
+    "cheerio": "^1.2.0",
+    "dotenv": "^18.0.10",
+    "fflate": "^0.8.3",
+    "robots-parser": "^3.1.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

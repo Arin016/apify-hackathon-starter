@@ -1,0 +1,59 @@
+{
+  "actorSpecification": 1,
+  "fields": {},
+  "views": {
+    "campaigns": {
+      "title": "Creator campaign recommendations",
+      "transformation": {
+        "fields": [
+          "status",
+          "creatorKey",
+          "campaignTitle",
+          "fitReason",
+          "hook",
+          "localEvidenceQuote",
+          "outreachDraft",
+          "fees",
+          "audienceGeography"
+        ]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "creatorKey": {
+            "label": "Creator / platform",
+            "format": "text"
+          },
+          "campaignTitle": {
+            "label": "Campaign concept",
+            "format": "text"
+          },
+          "fitReason": {
+            "label": "Evidence-backed fit",
+            "format": "text"
+          },
+          "hook": {
+            "label": "Opening hook",
+            "format": "text"
+          },
+          "localEvidenceQuote": {
+            "label": "Local evidence quote",
+            "format": "text"
+          },
+          "outreachDraft": {
+            "label": "Outreach draft",
+            "format": "text"
+          },
+          "fees": {
+            "label": "Creator fees",
+            "format": "text"
+          },
+          "audienceGeography": {
+            "label": "Audience geography",
+            "format": "text"
+          }
+        }
+      }
+    }
+  }
+}
