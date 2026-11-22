@@ -39,9 +39,8 @@
       "title": "Venue (optional)",
       "type": "string",
       "editor": "textfield",
-      "description": "Venue name for Google Maps context. Leave empty for the agent to research a relevant venue category.",
-      "default": "Old Spitalfields Market",
-      "prefill": "Old Spitalfields Market"
+      "description": "Optional venue name. Leave blank if unknown; use a venue in the selected city.",
+      "default": ""
     },
     "lookbackDays": {
       "title": "Evidence lookback (days)",
