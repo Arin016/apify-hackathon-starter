@@ -14,11 +14,13 @@ This is a research and drafting agent. It sends no messages and books no creator
 
 ## How the agent works
 
-1. DeepSeek V4 Flash plans research from your event, city, audience and objective.
-2. Google Maps supplies venue/local-business context. Instagram and TikTok Actors supply public creator posts and metadata.
-3. The agent evaluates the evidence, records rejected posts, and chooses whether one targeted Instagram or TikTok follow-up is useful.
+1. The ReAct agent reads the brief and chooses one next Actor tool and query.
+2. The controller validates the action, calls that tool and returns a bounded observation.
+3. The agent reads the observation and chooses another tool, revises its query or stops. The report records each public decision summary, action and observation.
 4. It proposes up to three campaign collaborations. Deterministic checks require retrieved evidence IDs, matching creator ownership, unique recommendations and an exact local caption quote.
-5. Missing evidence produces fewer recommendations or an explicit insufficient-evidence result. The system does not manufacture a full shortlist.
+5. Missing evidence produces fewer recommendations or an explicit insufficient-evidence result. Conflicting venue/city inputs can produce a clarification request.
+
+This is a bounded ReAct loop, not a fixed initial Maps → Instagram → TikTok chain. Tool order and follow-up searches are agent-selected. Public action justifications do not expose private model reasoning.
 
 Actors used as tools: `compass/crawler-google-places`, `apify/instagram-scraper`, `clockworks/tiktok-scraper`. No MCP server is required: the agent controller calls the Actors using the official Apify SDK/client.
 
@@ -26,7 +28,7 @@ Actors used as tools: `compass/crawler-google-places`, `apify/instagram-scraper`
 
 Required: `eventBrief`, `city`, `audience`, `objective`.
 
-Optional: `venue`, `lookbackDays` (1–180, default 90), `instagramHashtag` and `tiktokSearch` as initial research hints. Leave hints empty to let the agent choose. See `examples/demo.json` for the demonstration input.
+Optional: `venue`, `lookbackDays` (7–180, default 90), `instagramHashtag` and `tiktokSearch` as initial research hints. Leave hints empty to let the agent choose. See `examples/demo.json` for the demonstration input.
 
 ## Output
 
@@ -49,7 +51,7 @@ Launch pricing: no additional Actor fee. Platform usage, dependent Actor charges
 
 ## Costs and execution limits
 
-At most four paid Actor starts (three initial tools and one agent-selected follow-up), four bounded model calls including one repair, and 12 requested posts per social-tool call. Each tool has a $0.50 PPE cap, 1 GB memory and 90-second timeout. Dataset reads are capped. Parent execution is bounded separately. PPE caps do not guarantee an all-in dollar limit: usage-based compute and model charges are additional. Reported tool costs exclude the agent's own compute and inference.
+At most five paid Actor starts and seven ReAct decisions, plus up to two final drafting/repair model calls, and 12 requested posts per social-tool call. Each tool has a $0.50 PPE cap, 1 GB memory and 90-second timeout. Dataset reads are capped. Parent execution is bounded separately. PPE caps do not guarantee an all-in dollar limit: usage-based compute and model charges are additional. Reported tool costs exclude the agent's own compute and inference.
 
 The Actor uses platform usage billing for this initial demo; no additional creator-agent fee is configured. A per-completed-campaign fee can be evaluated after repeated cost measurements. Child Actor charges still apply.
 
