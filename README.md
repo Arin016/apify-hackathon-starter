@@ -82,7 +82,7 @@ Confidence is a deterministic verification-coverage score: contracts 20, plan 20
 - Only public IPv4 source destinations pass the initial URL policy. Downstream redirect behavior is delegated to the selected Actors; this is not a hardened general-purpose URL proxy.
 - Dependencies may be blocked, unavailable, change behavior, return no rows, or fail. Such runs fail clearly; missing data is not invented.
 - Checkpointing is scoped to resurrection of the same run, not deduplication of separate user requests. A crash between accepting a remote start and saving its ID is an unresolved distributed-systems window; exactly-once execution is not guaranteed.
-- Research planning has at most two attempts and the brief one call, plus one routing call for goal-only auto mode. Creator mode has one routing call and at most one idea-generation call per uninterrupted execution. Process resurrection can repeat an incomplete model call. The `fixed` setting applies to research planning, not creator routing.
+- Research planning has at most two attempts and the brief one call, plus one routing call for goal-only auto mode. Creator mode has one routing call, one idea-generation call and at most one editorial/schema repair call per uninterrupted execution. Process resurrection can repeat an incomplete model call. The `fixed` setting applies to research planning, not creator routing.
 - The search recipe requires a maximum-cost allocation of at least $1 ($0.50 per child) because of the search dependency’s minimum cap setting; this is not an upfront charge.
 
 - No automatic model-provider fallback, hidden credential sharing, Store publication or billing configuration.

@@ -6,7 +6,7 @@ import { inspect } from './platform.js';
 import { propose } from './planner.js';
 import { execute, platformServices, type Journal } from './workflow.js';
 import { exportProject, reportHtml } from './artifacts.js';
-import { routeGoal, runCreator, type CreatorSpec } from './creator.js';
+import { routeGoal, runCreator, creatorReport, type CreatorSpec } from './creator.js';
 
 await Actor.init();
 let state: Journal | undefined;
@@ -83,7 +83,13 @@ try {
   const token = process.env.APIFY_TOKEN ?? '';
   const message = (error instanceof Error ? error.message : 'Workflow failed').replaceAll(token || '__NO_TOKEN__', '[redacted]').slice(0, 1500);
   if (state) { state.phase = 'FAILED'; state.events.push({ at: new Date().toISOString(), phase: 'FAILED', detail: message }); await save(); }
-  const output = { status: 'FAILED', error: message, confidence: confidence(checks), plan, children: state?.children, events: state?.events };
+  let output: Record<string,any> = { status: 'FAILED', error: message, confidence: confidence(checks), plan, children: state?.children, events: state?.events };
+  const creatorSpec=await Actor.getValue<CreatorSpec>('GOAL_ROUTE');
+  if(creatorSpec?.kind==='creator') {
+    const evidence=await Actor.getValue<Record<string,any>>('CREATOR_LAST_EVIDENCE')??{spec:creatorSpec,posts:[],children:await Actor.getValue('CREATOR_CHILDREN')??{}};
+    output={...evidence,status:'FAILED',error:message,message,ideas:[]};
+    await Actor.setValue('REPORT.html',creatorReport(output),{contentType:'text/html'});
+  }
   await Actor.setValue('OUTPUT', output); await Actor.pushData(output); await Actor.fail(message);
 }
 await Actor.exit();
