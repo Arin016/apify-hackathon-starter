@@ -4,7 +4,7 @@ import {analyze} from './llm.js';
 import {inspect,validateDependencyInput} from './platform.js';
 import {hash,type Contract} from './contracts.js';
 import {renderReport,type VisualNode} from './presentation.js';
-export const Request=z.object({eventBrief:z.string().min(12).max(1200),city:z.string().min(2).max(100),audience:z.string().min(3).max(300),objective:z.string().min(5).max(400),venue:z.string().max(150).default(''),lookbackDays:z.number().int().min(7).max(180).default(90),instagramHashtag:z.string().regex(/^[A-Za-z0-9_]{1,60}$/).default(''),tiktokSearch:z.string().max(140).default('')});
+export const Request=z.object({eventBrief:z.string().min(12).max(1200),city:z.string().min(2).max(100),audience:z.string().min(3).max(300),objective:z.string().min(5).max(400),venue:z.string().max(150).default(''),lookbackDays:z.number().int().min(7).max(180).default(90),instagramHashtag:z.string().trim().transform(v=>v.replace(/^#/, '')).pipe(z.union([z.literal(''),z.string().regex(/^[A-Za-z0-9_]{1,60}$/)])).default(''),tiktokSearch:z.string().max(140).default('')});
 export type Brief=z.infer<typeof Request>;
 const IG='apify/instagram-scraper',TT='clockworks/tiktok-scraper',MAPS='compass/crawler-google-places';
 export const Plan=z.object({researchQuestion:z.string().max(350),mapsQuery:z.string().min(2).max(100),instagramHashtag:z.string().regex(/^[A-Za-z0-9_]{1,60}$/),tiktokSearch:z.string().min(2).max(140)});
