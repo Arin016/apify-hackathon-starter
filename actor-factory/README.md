@@ -4,9 +4,9 @@ Describe a public-data job. The Factory searches Apify Store, inspects candidate
 
 ## Workflow
 
-1. Enter a goal and sample inputs. Select **Discover and plan**.
+1. Enter a goal including any sample URL or search term. Select **Discover and plan**. The Console form only shows goal, mode and generated name.
 2. Open the result and visual report. The plan contains the workflow graph, chosen Actors, dependencies, mappings, resource bounds and declared checks. `PLANNED_NOT_TESTED` is an untested plan; `ACTOR_REVIEW_REQUIRED` identifies dependencies to review.
-3. Review each Actor's Store listing and permissions. Start a fresh run in **Test approved workflow**, provide reviewed Actor IDs and paste the previous `plan.definition` into Workflow JSON to test the same plan. Supply the same goal and sample parameters. Paid tool calls are bounded; compute and model charges are additional.
+3. Review each Actor's Store listing and permissions. To test the exact plan with unfamiliar Actors, use JSON/API input in a fresh run: include reviewed `candidateActorIds`, paste the prior `plan.definition` as a JSON string in `workflowJson`, and supply matching `parametersJson` if the graph needs parameters. The simplified form can test trusted Actors automatically; it will return review required for other dependencies. Paid tool calls are bounded; compute and model charges are additional.
 4. After declared checks pass, download `ACTOR_PROJECT.zip`. With the official Apify CLI logged in, unzip and run:
 
 ```sh

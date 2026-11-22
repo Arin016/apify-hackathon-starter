@@ -7,9 +7,9 @@
       "title": "What should your Actor do?",
       "type": "string",
       "editor": "textarea",
-      "description": "Describe the desired output, data sources and constraints. Public read-only workflows supported.",
-      "prefill": "Collect a public website page and produce a short source-backed brief about the organization.",
-      "default": "Collect a public website page and produce a short source-backed brief about the organization."
+      "description": "Describe the task and include any sample URL, location or search term in this prompt. The planner may ask for missing details.",
+      "prefill": "Visit https://apify.com/actors and produce a short source-backed brief about the platform.",
+      "default": "Visit https://apify.com/actors and produce a short source-backed brief about the platform."
     },
     "mode": {
       "title": "Plan or test",
@@ -24,21 +24,7 @@
         "Test approved workflow"
       ],
       "default": "plan",
-      "description": "Plan discovers tools and exports an untested project. Execute starts bounded paid tool runs after dependency review."
-    },
-    "parametersJson": {
-      "title": "Sample inputs (JSON)",
-      "type": "string",
-      "editor": "textarea",
-      "default": "{}",
-      "description": "Optional sample inputs used by the planned workflow, for example a public URL."
-    },
-    "candidateActorIds": {
-      "title": "Reviewed Actor IDs (optional)",
-      "type": "array",
-      "editor": "stringList",
-      "default": [],
-      "description": "Leave empty to discover Actors. To approve discovered dependencies, review them and provide their owner/name IDs in a new test run."
+      "description": "Plan discovers and exports an untested workflow. Test runs trusted tools, or returns a review-required status for unfamiliar tools. Advanced reviewed workflows can be supplied via API."
     },
     "generatedName": {
       "title": "Generated Actor name",
@@ -47,22 +33,6 @@
       "default": "compiled-goal-workflow",
       "pattern": "^[a-z][a-z0-9-]{2,49}$",
       "description": "Name for the generated project. Deployment may update an existing Actor with the same name."
-    },
-    "testBudgetUsd": {
-      "title": "Child PPE allocation (USD)",
-      "type": "number",
-      "minimum": 0.1,
-      "maximum": 4,
-      "default": 2,
-      "description": "Sum of declared child pay-per-event caps. Compute and AI charges are additional; not an all-in spending limit."
-    },
-    "workflowJson": {
-      "title": "Approved workflow JSON (optional)",
-      "sectionCaption": "Advanced workflow controls",
-      "type": "string",
-      "editor": "textarea",
-      "default": "",
-      "description": "Paste the graph definition from a prior plan to test that exact workflow after review."
     }
   },
   "required": [
