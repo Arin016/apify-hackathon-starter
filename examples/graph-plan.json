@@ -1,0 +1,11 @@
+{
+  "workflowMode": "graph",
+  "mode": "plan",
+  "goal": "Read https://apify.com/actors and produce a short brief with source URL and exact source quotes.",
+  "candidateActorIds": [
+    "apify/website-content-crawler"
+  ],
+  "parametersJson": "{}",
+  "testBudgetUsd": 1,
+  "generatedName": "goal-planned-website-brief"
+}

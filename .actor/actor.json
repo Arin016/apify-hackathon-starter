@@ -26,6 +26,11 @@
         "type": "string",
         "title": "Download generated Actor project",
         "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/ACTOR_PROJECT.zip"
+      },
+      "deployment": {
+        "type": "string",
+        "title": "Created Actor and test receipt",
+        "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/DEPLOYMENT"
       }
     }
   }

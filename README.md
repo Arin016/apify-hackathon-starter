@@ -1,8 +1,42 @@
 # Workflow Composer
 
-Bring the Actors you use—or describe your goal—and turn them into one tested, reusable workflow Actor.
+Bring your current workflow or goal. Compare complete alternatives against the same output requirements on your sample, then export a passing workflow as a reusable Actor.
 
-## Current MVP
+## Workflow comparison — the core product
+
+Teams often keep their first Actors because testing substitutes takes time. A Store price does not establish whether another workflow preserves required fields, input coverage and usable output. Comparison mode measures complete candidate workflows against one frozen acceptance contract and input cohort.
+
+Use `workflowMode: "benchmark"` with `examples/benchmark-live.json`. The default research comparison tests **Search + Website Content Crawler**, **RAG Web Browser**, and **direct URL crawling**. All must return URL, title and at least 300 characters of readable text, with all supplied input URLs covered and no duplicate keys. Because the sample already supplies a URL, removing discovery is a real candidate, not a changed task. RAG uses its documented URL fast path. Candidate failure is retained with reasons; missing data is not silently dropped from the score.
+
+Each candidate runs in its own bounded instance of the graph runner, so reported candidate cost includes its wrapper and explicitly recorded child runs. Tests use the same parameters/contract, two concurrent wrappers at most, one sample attempt by default, and $2 of total child PPE allocations in the example (not an upfront charge or guaranteed all-in limit). Model-node costs and undocumented nested/external charges are not inferred. Model-node candidates with unknown total costs block a cheapest recommendation. Coordinator overhead is separate. One successful sample is not a production reliability estimate.
+
+`benchmarkJson` accepts other candidate graphs and a shared contract, allowing comparisons beyond the built-in proposal recipe. Candidate generation is currently curated for web-text collection; broad automatic alternative discovery is not a solved universal optimizer. Missing-field, schema, coverage and cost failures remain visible. Only a passing, cost-measurable candidate can become the lowest-observed-cost recommendation. A baseline that is already best should be kept.
+
+The report follows the supplied product reference: light-gray canvas, white cards, navy rail, purple/blue accents, a selectable workflow graph, step inspector, actual costs, input coverage and source evidence. Download creates a real project ZIP; the deploy helper builds/tests it and attaches an Actor/run receipt back to the originating run when origin metadata is present.
+
+## General workflow compiler
+
+Set `workflowMode` to `graph` to compile a declarative DAG, or let goal-only auto routing choose the graph path for other public read-only data workflows. `candidateActorIds` supplies reviewed existing Actors; an empty list enables bounded Store discovery (up to three search queries and six inspected candidates). Newly discovered dependencies outside the maintained trusted catalog return `ACTOR_REVIEW_REQUIRED` before paid execution. Review them and provide their IDs as candidates to proceed. There is no promise of arbitrary-goal coverage.
+
+The graph supports Actor nodes, registered `project`/`concat`/`dedupe` transforms, and model nodes with runtime-validated output JSON schemas. JSON-pointer bindings support take/pluck/wrap/truncate operations. No plan can execute JavaScript, shell, loops or unbounded fanout. The compiler checks references, DAG order, Actor admission, aggregate PPE allocations, cardinality and declared runtime limits; the executor validates actual downstream inputs and output schemas. Explicit gates check nonempty rows, required fields, freshness and quote provenance with whitespace normalization. Passing means the declared checks passed, not semantic truth.
+
+Examples:
+
+- `examples/website-graph.json`: readable workflow definition.
+- `examples/graph-live.json`: execute that graph with a public URL.
+- `examples/graph-plan.json`: let DeepSeek plan a graph from the goal and a reviewed Actor contract without starting dependencies.
+
+Bounds: at most six nodes, four Actor starts, two runtime model calls, 100 read rows per Actor and 100 records at a transform, with aggregate declared execution time at most 300 seconds. Store discovery and graph planning use additional bounded model calls (one discovery call, up to two planning attempts; auto routing may add one). Parent compute, inference and usage-based charges are additional to PPE caps. Long-running or unsupported capabilities return explicit failures/clarifications; schemas are not a guarantee of undocumented Actor behavior. Unknown output mappings must be tested.
+
+Every export includes `scripts/deploy-workflow.mjs`. After unzipping, with the official CLI already logged in:
+
+```sh
+node scripts/deploy-workflow.mjs --project-dir . --test
+```
+
+The helper pushes the complete project, waits for a successful build and starts a fresh paid smoke run. It writes a local `deployment/result.json` receipt with the Actor/build/run details. Without `--test`, it deploys only. `apify push` creates or updates the Actor named in the project; `--actor-id` explicitly targets an existing Actor. CLI authorization stays local; no account-management token is packaged in the runtime. A result JSON is data; the compiled graph plus source/template/configuration form the executable Actor.
+
+## Specialized recipes
 
 Supports website research (Google Search → Website Content Crawler → DeepSeek, or explicit URLs → crawler → brief) and a new creator-content recipe (Instagram + YouTube → freshness/metric checks → within-platform ranking → five sourced creative ideas). This is a bounded compiler with a small supported catalog, not arbitrary Store-wide discovery or integration code generation. Unsupported selections fail validation or ask for clarification.
 
@@ -78,7 +112,7 @@ Confidence is a deterministic verification-coverage score: contracts 20, plan 20
 
 ## Limits
 
-- Two supported research recipes and one creator recipe; no arbitrary DAGs, alternative-workflow benchmark, joins, branches, or MCP discovery UI yet.
+- Specialized research/creator recipes plus bounded declarative graphs. Comparison is implemented for supplied graph candidates and a curated web-text proposal set. No arbitrary code generation, joins, conditional branches, loops or MCP discovery UI yet.
 - Only public IPv4 source destinations pass the initial URL policy. Downstream redirect behavior is delegated to the selected Actors; this is not a hardened general-purpose URL proxy.
 - Dependencies may be blocked, unavailable, change behavior, return no rows, or fail. Such runs fail clearly; missing data is not invented.
 - Checkpointing is scoped to resurrection of the same run, not deduplication of separate user requests. A crash between accepting a remote start and saving its ID is an unresolved distributed-systems window; exactly-once execution is not guaranteed.

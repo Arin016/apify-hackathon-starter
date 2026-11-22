@@ -7,8 +7,11 @@ import { propose } from './planner.js';
 import { execute, platformServices, type Journal } from './workflow.js';
 import { exportProject, reportHtml } from './artifacts.js';
 import { routeGoal, runCreator, creatorReport, type CreatorSpec } from './creator.js';
+import {runGraph,type FrozenGraph} from './graph-runtime.js';
+import {runBenchmark,benchmarkReport} from './benchmark.js';
 
 await Actor.init();
+let requestedMode:unknown;
 let state: Journal | undefined;
 let plan: Plan | undefined;
 let contracts: Contract[] = [];
@@ -19,13 +22,23 @@ try {
   try { frozen = JSON.parse(await readFile(new URL('../compiled.workflow.json', import.meta.url), 'utf8')); }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
   const raw = await Actor.getInput<Record<string, unknown>>() ?? {};
-  console.log('CONTROLLER: input received');
+  console.log('CONTROLLER: input received');requestedMode=raw.workflowMode;
+  if(!await Actor.getValue('DEPLOYMENT'))await Actor.setValue('DEPLOYMENT',{status:'NOT_DEPLOYED',message:'Download the generated project and run its deployment helper.'});
+  let graphFrozen:FrozenGraph|undefined;
+  try{graphFrozen=JSON.parse(await readFile(new URL('../compiled.graph.json',import.meta.url),'utf8'));}
+  catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
   let creatorFrozen: { input: Record<string, any>; spec: CreatorSpec; contracts: Contract[] } | undefined;
   try { creatorFrozen = JSON.parse(await readFile(new URL('../compiled.creator.json', import.meta.url), 'utf8')); }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
+  if(graphFrozen&&raw.workflowMode&&raw.workflowMode!=='graph')throw new Error('Frozen graph execution mode cannot be overridden');
+  if(!frozen&&!creatorFrozen&&!graphFrozen&&raw.workflowMode==='benchmark'){await runBenchmark(raw);await Actor.exit();}
+  if(graphFrozen||(!frozen&&!creatorFrozen&&(raw.workflowMode==='graph'||(raw.workflowMode==='auto'&&Array.isArray(raw.candidateActorIds)&&raw.candidateActorIds.length)))) {
+    await runGraph(raw,graphFrozen);await Actor.exit();
+  }
+  const {workflowJson,candidateActorIds,parametersJson,benchmarkJson,acceptanceJson,...legacyRaw}=raw;
   if (creatorFrozen && raw.goal && raw.goal !== creatorFrozen.input.goal) throw new Error('Frozen creator goal cannot be overridden; compile a new workflow.');
   if (frozen && ((raw.goal && raw.goal !== frozen.input.goal) || (raw.actorIds && hash(raw.actorIds) !== hash(frozen.input.actorIds)))) throw new Error('Frozen goal/Actor selections cannot be overridden; compile a new workflow');
-  const input = Input.parse({ ...frozen?.input, ...creatorFrozen?.input, ...raw });
+  const input = Input.parse({ ...frozen?.input, ...creatorFrozen?.input, ...legacyRaw });
   if (creatorFrozen && (input.workflowMode !== 'creator' || input.actorIds.length)) throw new Error('Frozen creator source selection cannot be overridden.');
   let route = await Actor.getValue<CreatorSpec>('GOAL_ROUTE');
   console.log('CONTROLLER: routing checkpoint read');
@@ -33,6 +46,8 @@ try {
     route = creatorFrozen?.spec ?? await routeGoal(input.goal);
     await Actor.setValue('GOAL_ROUTE',route);
   }
+  if(!frozen&&!creatorFrozen&&route?.kind==='benchmark'){requestedMode='benchmark';await runBenchmark({...raw,goal:input.goal});await Actor.exit();}
+  if(!frozen&&!creatorFrozen&&route?.kind==='graph'){await runGraph({...raw,goal:input.goal});await Actor.exit();}
   if (!frozen && (creatorFrozen || input.workflowMode === 'creator' || route?.kind === 'creator')) {
     if (!route || route.kind !== 'creator') throw new Error('Creator mode needs a recent social-content brief goal.');
     await runCreator(input,route,creatorFrozen?.contracts);
@@ -90,6 +105,7 @@ try {
     output={...evidence,status:'FAILED',error:message,message,ideas:[]};
     await Actor.setValue('REPORT.html',creatorReport(output),{contentType:'text/html'});
   }
+  if(requestedMode==='benchmark'){const partial=await Actor.getValue<Record<string,any>>('OUTPUT')??{};output={...partial,status:'FAILED',error:message,message};await Actor.setValue('REPORT.html',benchmarkReport(output),{contentType:'text/html'});}
   await Actor.setValue('OUTPUT', output); await Actor.pushData(output); await Actor.fail(message);
 }
 await Actor.exit();

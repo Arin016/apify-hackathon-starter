@@ -15,6 +15,7 @@ export async function exportProject(input: ComposerInput, plan: Plan, contracts:
   for (const name of ['package.json', 'package-lock.json', 'tsconfig.json', '.dockerignore', '.gitignore', '.env.example']) add(name, await readFile(new URL(name, root), 'utf8'));
   for (const name of await readdir(new URL('src/', root))) if (name.endsWith('.ts')) add(`src/${name}`, await readFile(new URL(`src/${name}`, root), 'utf8'));
   for (const name of await readdir(new URL('tests/', root))) if (name.endsWith('.ts')) add(`tests/${name}`, await readFile(new URL(`tests/${name}`, root), 'utf8'));
+  for(const name of await readdir(new URL('scripts/',root)))if(name.endsWith('.mjs'))add('scripts/'+name,await readFile(new URL('scripts/'+name,root),'utf8'));
   const manifest = JSON.parse(await readFile(new URL('.actor/actor.json', root), 'utf8'));
   manifest.name = input.generatedName; manifest.title = plan.title; manifest.description = 'Compiled, reusable sourced-brief workflow. Dependency builds and input contracts are pinned.';
   if (manifest.output?.properties) delete manifest.output.properties.project;

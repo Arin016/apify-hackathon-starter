@@ -7,10 +7,22 @@
       "title": "Workflow type",
       "type": "string",
       "editor": "select",
-      "enum": ["auto", "research", "creator"],
-      "enumTitles": ["Choose from my goal", "Website research", "Creator content brief"],
+      "enum": [
+        "auto",
+        "research",
+        "creator",
+        "graph",
+        "benchmark"
+      ],
+      "enumTitles": [
+        "Choose from my goal",
+        "Website research",
+        "Creator content brief",
+        "General workflow graph",
+        "Compare complete workflows"
+      ],
       "default": "auto",
-      "description": "Auto routes a goal-only request into a supported recipe. Creator mode selects Instagram and YouTube internally; it does not search the full Actor Store."
+      "description": "Choose a specialized brief, a general workflow graph, or a comparison of complete workflows against the same output requirements."
     },
     "mode": {
       "title": "Mode",
@@ -74,7 +86,7 @@
       "minimum": 0.1,
       "maximum": 2,
       "default": 1,
-      "description": "Divided into PPE caps for child runs. Pay-per-usage compute, parent compute, and AI are additional; not a hard total-dollar ceiling."
+      "description": "Child PPE allocations, summed across candidates in comparison mode. Not upfront spending or a hard all-in cap; compute and model costs are additional."
     },
     "planner": {
       "title": "Planner",
@@ -87,6 +99,28 @@
       "default": "deepseek",
       "description": "DeepSeek proposes a typed recipe. Fixed skips model planning for an explicitly configured supported recipe."
     },
+    "candidateActorIds": {
+      "title": "Reviewed candidate Actors",
+      "sectionCaption": "Workflow graph settings",
+      "type": "array",
+      "editor": "stringList",
+      "default": [],
+      "description": "Optional owner/name IDs for general graph planning. Empty lets the compiler discover Store candidates. Newly discovered dependencies outside the maintained catalog require review before execution; provide their IDs here after reviewing."
+    },
+    "workflowJson": {
+      "title": "Workflow graph JSON",
+      "type": "string",
+      "editor": "textarea",
+      "default": "",
+      "description": "Optional explicit version-1 graph. Leave empty to plan from the goal and live Actor contracts. This is data, never executable code."
+    },
+    "parametersJson": {
+      "title": "Workflow parameters JSON",
+      "type": "string",
+      "editor": "textarea",
+      "default": "{}",
+      "description": "Values bound through $input references and validated against the graph's inputSchema. Use public inputs; do not paste account tokens."
+    },
     "generatedName": {
       "title": "Generated Actor name",
       "type": "string",
@@ -94,6 +128,20 @@
       "default": "composed-research-workflow",
       "pattern": "^[a-z][a-z0-9-]{2,49}$",
       "description": "Actor name embedded in the generated project."
+    },
+    "benchmarkJson": {
+      "title": "Workflow comparison suite JSON",
+      "type": "string",
+      "editor": "textarea",
+      "default": "",
+      "description": "Optional candidate graphs plus one acceptance contract and shared parameters. Empty uses the built-in Search + Crawler vs RAG Browser vs direct URL comparison; supply parametersJson with your public url."
+    },
+    "acceptanceJson": {
+      "title": "Shared acceptance contract JSON",
+      "type": "string",
+      "editor": "textarea",
+      "default": "",
+      "description": "Optional declared row schema and coverage contract for general graphs. Comparison mode injects the same frozen contract into every candidate and preserves it in the winning Actor."
     }
   },
   "required": [

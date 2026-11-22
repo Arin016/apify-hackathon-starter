@@ -1,0 +1,7 @@
+{
+  "workflowMode": "benchmark",
+  "mode": "execute",
+  "goal": "Compare my current Search + Crawler workflow with alternatives on this sample URL. Preserve URL, title, readable text and full input coverage.",
+  "parametersJson": "{\"url\": \"https://apify.com/actors\", \"query\": \"https://apify.com/actors\"}",
+  "testBudgetUsd": 2
+}
