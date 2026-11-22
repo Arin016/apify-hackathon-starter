@@ -1,0 +1,11 @@
+{
+  "actorSpecification": 1,
+  "name": "hackathon-evidence-starter",
+  "title": "Hackathon Evidence Starter",
+  "description": "Setup smoke test: collect a small public HTML evidence sample. Replace with the chosen product before publishing.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "dockerfile": "./Dockerfile",
+  "input": "./INPUT_SCHEMA.json",
+  "readme": "../README.md"
+}

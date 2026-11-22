@@ -1,0 +1,17 @@
+{
+  "title": "Evidence starter input",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "aiCheck": {
+      "title": "Check AI connectivity", "type": "boolean", "default": false,
+      "description": "Optional tiny paid inference using Apify credits. Off by default."
+    },
+    "mode": {
+      "title": "Run mode", "type": "string", "editor": "select",
+      "enum": ["fixture", "live"], "default": "fixture",
+      "description": "Fixture is synthetic and makes no network requests. Live reads example.com to verify connectivity."
+    }
+  },
+  "required": ["mode"]
+}
