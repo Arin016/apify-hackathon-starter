@@ -10,7 +10,8 @@ export async function analyze<T>(sourceText: string, instruction: string, schema
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: process.env.LLM_MODEL || 'deepseek/deepseek-v4-flash',
-      temperature: 0, max_tokens: 1200,
+      temperature: 0, max_tokens: 2500,
+      reasoning: { effort: 'none' },
       response_format: { type: 'json_schema', json_schema: { name: 'controller_output', strict: true, schema: z.toJSONSchema(schema) } },
       provider: { require_parameters: true },
       messages: [
@@ -23,8 +24,8 @@ export async function analyze<T>(sourceText: string, instruction: string, schema
     const detail = (await response.text()).replaceAll(token, '[redacted]').slice(0, 600);
     throw new Error(`AI proxy returned ${response.status}: ${detail}`);
   }
-  const result = await response.json() as { choices?: { message?: { content?: string } }[] };
+  const result = await response.json() as { choices?: { finish_reason?: string; message?: { content?: string } }[]; usage?: { completion_tokens?: number } };
   const content = result.choices?.[0]?.message?.content;
-  if (!content) throw new Error('AI proxy returned no content');
+  if (!content) throw new Error(`AI proxy returned no content (finish=${result.choices?.[0]?.finish_reason ?? 'unknown'}, completionTokens=${result.usage?.completion_tokens ?? 'unknown'})`);
   return schema.parse(JSON.parse(content));
 }
